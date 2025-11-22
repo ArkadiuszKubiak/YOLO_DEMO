@@ -1,0 +1,65 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+dist/
+build/
+.venv/
+venv/
+ENV/
+env/
+
+# YOLO Models
+*.pt
+*.pth
+*.weights
+*.onnx
+*.engine
+*.tflite
+*.mlmodel
+
+# Datasets
+pokemon_detector/pokemon-*/
+pokemon_detector/Pokemon-*/
+pokemon_detector/poke-*/
+dog_detector/dataset/
+**/dataset/
+**/datasets/
+
+# Training runs and results
+runs/
+**/runs/
+wandb/
+**/wandb/
+
+# Output images
+*_detected.jpg
+*_detected.png
+*_annotated.jpg
+*_annotated.png
+
+# Roboflow
+.roboflow/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Logs
+*.log
+logs/
+
+# Jupyter Notebooks
+.ipynb_checkpoints/
+*.ipynb
+
+# Environment variables
+.env
+.env.local
