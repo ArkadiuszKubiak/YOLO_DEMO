@@ -40,7 +40,7 @@ These metrics tell you **how good your model is** at detecting Pokemon. Calculat
 
 **Real-world:** High recall means the model won't miss Pokemon in your images - it finds almost all of them.
 
-#### ⚖️ The Trade-off
+#### The Trade-off
 You can't always have both perfect! It's a balance:
 - **High confidence threshold** (e.g., 0.7) → High Precision, Lower Recall (fewer but more accurate detections)
 - **Low confidence threshold** (e.g., 0.3) → Lower Precision, High Recall (finds more but with some mistakes)
@@ -331,26 +331,45 @@ After training the Pokemon detector, results are saved to `pokemon_detector/runs
 - **Loss curves still decreasing** - Model could improve with more epochs
 - **Confusion matrix scattered** - Some Pokemon classes are too similar or mislabeled in dataset
 
+## Advanced Documentation
+
+For comprehensive training analysis, visual guides, and improvement strategies, see:
+
+- **[doc/README.md](doc/README.md)** - Documentation hub
+- **[doc/TRAINING_COMPARISON.md](doc/TRAINING_COMPARISON.md)** - Detailed comparison of 10 vs 50 epoch training with improvement roadmap
+- **[doc/VISUAL_GUIDE.md](doc/VISUAL_GUIDE.md)** - Complete guide to interpreting training results and charts
+
+**Highlights:**
+- In-depth performance analysis (50 epochs achieves 93.2% mAP@50)
+- How to read confusion matrix, PR curves, and F1 curves
+- Step-by-step improvement roadmap to reach 97-98% accuracy
+- Best practices and troubleshooting guide
+
 ## Project Structure
 
 ```
 YOLO/
-├── dog_detector/
-│   ├── dog_detector.py
-│   ├── dog.jpg
-│   ├── requirements.txt
-│   └── README.md
-│
-├── pokemon_detector/
-│   ├── download_pokemon_dataset.py
-│   ├── train_pokemon.py
-│   ├── pokemon_detector.py
-│   ├── requirements.txt
-│   ├── POKEMON_TRAINING.md
-│   └── runs/
-│       └── detect/
-│           └── pokemon_detector/    # Training results here
-│
-└── .vscode/
-    └── tasks.json          # Pre-configured VS Code tasks
+ dog_detector/
+    dog_detector.py
+    dog.jpg
+    requirements.txt
+    README.md
+
+ pokemon_detector/
+    download_pokemon_dataset.py
+    train_pokemon.py
+    pokemon_detector.py
+    requirements.txt
+    POKEMON_TRAINING.md
+    runs/
+        detect/
+            pokemon_detector/    # Training results here
+
+ doc/                    #  Comprehensive documentation
+    README.md           # Documentation hub
+    TRAINING_COMPARISON.md  # Training analysis & improvements
+    VISUAL_GUIDE.md     # Chart interpretation guide
+
+ .vscode/
+     tasks.json          # Pre-configured VS Code tasks
 ```
