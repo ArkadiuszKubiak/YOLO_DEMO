@@ -1,6 +1,96 @@
 # YOLO Projects
 
-This workspace contains two separate YOLO detection projects.
+This workspace contains two separate YOLO detecti**Why split?** If model only saw training images, it would memorize them (like learning exam answers by heart). Validation and test sets ensure model can handle new, unseen images.
+
+### Key Metrics (mAP, Precision, Recall)
+
+These metrics tell you **how good your model is** at detecting Pokemon. Calculated on validation set after each epoch.
+
+#### Precision (Accuracy of Detections)
+**"When the model says it found a Pokemon, how often is it correct?"**
+
+**Formula:** Precision = Correct Detections ÷ All Detections
+
+**Example:**
+- Model makes 100 detections
+- 85 are correct Pokemon (True Positives)
+- 15 are wrong - detected nothing or wrong class (False Positives)
+- **Precision = 85 ÷ 100 = 0.85 (85%)**
+
+**What it means:**
+- **High Precision (>80%)** = Model is reliable, few false alarms
+- **Low Precision (<60%)** = Model sees Pokemon everywhere (even where there aren't any)
+
+**Real-world:** High precision means when you use the detector, most boxes it draws are actually Pokemon, not random objects.
+
+#### Recall (Detection Coverage)
+**"Out of all Pokemon in the image, how many did the model find?"**
+
+**Formula:** Recall = Found Pokemon ÷ Total Pokemon in Image
+
+**Example:**
+- Image has 10 Pokemon total
+- Model finds 8 of them correctly (True Positives)
+- Model misses 2 Pokemon (False Negatives)
+- **Recall = 8 ÷ 10 = 0.80 (80%)**
+
+**What it means:**
+- **High Recall (>80%)** = Model finds most Pokemon, few missed detections
+- **Low Recall (<60%)** = Model misses many Pokemon that are actually there
+
+**Real-world:** High recall means the model won't miss Pokemon in your images - it finds almost all of them.
+
+#### ⚖️ The Trade-off
+You can't always have both perfect! It's a balance:
+- **High confidence threshold** (e.g., 0.7) → High Precision, Lower Recall (fewer but more accurate detections)
+- **Low confidence threshold** (e.g., 0.3) → Lower Precision, High Recall (finds more but with some mistakes)
+
+# mAP (Mean Average Precision) - Overall Score
+**"How well does the model perform across all Pokemon classes and detection thresholds?"**
+
+**What it measures:**
+- Combines precision and recall into one number
+- Calculated for each Pokemon class, then averaged
+- Tests at different overlap thresholds (how well boxes match ground truth)
+
+**Two versions:**
+- **mAP@0.5 (mAP50)** - Box must overlap ground truth by 50% to count as correct
+  - Example: mAP50 = 0.75 means 75% average precision across all classes
+  - **Easier metric** - more forgiving on box position
+  
+- **mAP@0.5:0.95 (mAP50-95)** - Tests at multiple thresholds (0.5, 0.55, 0.6... 0.95)
+  - Example: mAP50-95 = 0.60 means 60% average precision at stricter standards
+  - **Harder metric** - requires precise box placement
+  - **Industry standard** for comparing models
+
+**What good scores look like:**
+- **mAP50 > 0.70** = Model works well for most use cases
+- **mAP50 > 0.85** = Excellent model, production-ready
+- **mAP50-95 > 0.50** = Good box localization (boxes placed accurately)
+- **mAP50-95 > 0.70** = Exceptional model, very precise
+
+**Practical example:**
+```
+After 50 epochs of training:
+- Precision: 0.82 (82%) - 82% of detections are correct
+- Recall: 0.78 (78%) - Model finds 78% of all Pokemon
+- mAP50: 0.75 (75%) - 75% overall accuracy (good!)
+- mAP50-95: 0.58 (58%) - 58% with strict box requirements
+
+This means:
+Model is reliable (high precision)
+Finds most Pokemon (decent recall)
+Works well overall (mAP50 > 70%)
+Could improve box precision (mAP50-95 could be higher)
+```
+
+**Which metric matters most?**
+- **Precision** - If false alarms are costly (e.g., medical diagnosis)
+- **Recall** - If missing detections is costly (e.g., security cameras)
+- **mAP50** - Best single metric for general object detection quality
+- **mAP50-95** - When you need very accurate box placement
+
+### Epochs (Training Cycles)projects.
 
 ## Requirements
 
@@ -39,6 +129,103 @@ python pokemon_detector.py --input your_image.jpg
 ```
 
 See `pokemon_detector/POKEMON_TRAINING.md` for full training guide.
+
+## Training Basics: Understanding Key Concepts
+
+### Dataset Split (Train, Validation, Test)
+
+When you download a dataset, it's automatically divided into three parts:
+
+- **Train Set (70-80%)** - Images used to teach the model:
+  - Model learns patterns from these images
+  - Example: 800 Pokemon images
+  - Model adjusts its weights based on these examples
+  
+- **Validation Set (10-15%)** - Images used to evaluate during training:
+  - Model is tested on these after each epoch
+  - Example: 150 Pokemon images
+  - Used to calculate **mAP, precision, recall** (see metrics explanation below )
+  - Helps detect overfitting (model memorizing instead of learning)
+  - **Model never trains on these images**
+  
+- **Test Set (10-15%)** - Images for final evaluation:
+  - Used only after training is complete
+  - Example: 150 Pokemon images
+  - Gives unbiased measure of real-world performance
+  - **Model never sees these during training or validation**
+
+**Why split?** If model only saw training images, it would memorize them (like learning exam answers by heart). Validation and test sets ensure model can handle new, unseen images.
+
+### Epochs (Training Cycles)
+
+An **epoch** is one complete pass through the entire training dataset.
+
+**Example with 800 training images:**
+- Epoch 1: Model sees all 800 images once, learns patterns
+- Epoch 2: Model sees same 800 images again, refines learning
+- Epoch 50: Model has seen all 800 images 50 times, very well trained
+
+**More epochs = More learning time**
+- 10 epochs (quick training) - Model learns basic patterns
+- 50 epochs (standard) - Model learns well, good for most cases
+- 100+ epochs (extensive) - For complex datasets or higher accuracy
+
+**When to stop training:**
+- Loss curves flatten out (no improvement)
+- Validation mAP stops increasing
+- Model starts overfitting (train accuracy high, validation low)
+
+### Batches (Groups of Images)
+
+A **batch** is a small group of images processed together in one step.
+
+**Example with batch size 16:**
+- Instead of processing 800 images one-by-one
+- Model processes 16 images at a time
+- 800 images ÷ 16 batch size = 50 batches per epoch
+
+**Why use batches?**
+- **Efficiency**: GPU can process multiple images in parallel
+- **Memory**: Loading all 800 images at once would crash (out of memory)
+- **Stability**: Averaging over multiple images gives smoother learning
+
+**Batch Size Guidelines:**
+- **Batch 4-8**: Low memory systems (old GPUs or CPU training)
+- **Batch 16**: Standard, good balance (default)
+- **Batch 32+**: High-end GPUs with lots of VRAM
+
+**Full Training Example (50 epochs, batch 16, 800 images):**
+```
+Epoch 1:
+  Batch 1: Process images 1-16, update model
+  Batch 2: Process images 17-32, update model
+  ...
+  Batch 50: Process images 785-800, update model
+  → Validate on 150 validation images
+  
+Epoch 2:
+  Batch 1: Process images 1-16 again, update model
+  ...
+  
+[Repeat for 50 epochs total]
+
+Final: Test on 150 test images (never seen before)
+```
+
+**Total steps in training:** 50 epochs × 50 batches = 2,500 model updates
+
+### Practical Training Commands
+
+```bash
+# Quick test (10 epochs, small batches)
+python train_pokemon.py --epochs 10 --batch-size 8
+
+# Standard training (50 epochs, default batch 16)
+python train_pokemon.py --epochs 50
+
+# High accuracy (100 epochs, larger batches, bigger model)
+python train_pokemon.py --epochs 100 --batch-size 32 --model-size s
+```
 
 ## Using VS Code Task Runner
 
