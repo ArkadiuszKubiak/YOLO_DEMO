@@ -571,10 +571,10 @@ After understanding your results:
    -  Fine-tune confidence threshold
 
 2. **If model needs improvement (mAP50 < 85%):**
-   -  Collect more training data
-   -  Try larger model (YOLOv8s/m)
-   - ⏱ Train longer (100+ epochs)
-   -  Check data quality and balance
+   - Collect more training data
+   - Try larger model (YOLOv8s/m)
+   - Train longer (100+ epochs)
+   - Check data quality and balance
 
 3. **Always:**
    -  Monitor all metrics, not just mAP@50
